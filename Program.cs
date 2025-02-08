@@ -4,9 +4,24 @@ namespace YTMusicLocalSync
 {
     class Program
     {
-        static async Task Main(string[] args)
+        private static readonly Config _config = new();
+
+        public static async Task Main(string[] args)
         {
-            Console.WriteLine("Empty");
+            _config.Load();
+
+            await API.StartAsync(async youtubeService =>
+            {
+                var playlists = await API.GetPlaylistsAsync(youtubeService);
+                Console.WriteLine("User Playlists:");
+                foreach (var playlist in playlists)
+                {
+                    Console.WriteLine($"{playlist.Snippet.Title} (ID: {playlist.Id})");
+                }
+            });
+
+            Console.WriteLine("Application running. Press Ctrl+C to exit.");
+            await Task.Delay(-1);
         }
     }
 }
