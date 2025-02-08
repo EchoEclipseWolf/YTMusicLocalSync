@@ -39,6 +39,14 @@ namespace YTMusicLocalSync {
                                 else {
                                     Console.WriteLine("Failed to retrieve playlists.");
                                 }
+
+                                var likedVideosPlaylist = await api.GetLikedVideosPlaylistAsync(youtubeService);
+                                if (likedVideosPlaylist != null) {
+                                    Console.WriteLine($"\nYour Liked Videos Playlist: {likedVideosPlaylist}");
+                                }
+                                else {
+                                    Console.WriteLine("Failed to retrieve liked videos playlist.");
+                                }
                             }
                             else {
                                 Console.WriteLine("Failed to initialize YouTube API. Program will exit.");

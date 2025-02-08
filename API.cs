@@ -95,4 +95,44 @@ public class API
             return null;
         }
     }
+
+    public async Task<List<string>> GetLikedVideosPlaylistAsync(YouTubeService youtubeService)
+    {
+        if (youtubeService == null) return null;
+
+        try
+        {
+            var videosListRequest = youtubeService.Videos.List("snippet"); // Use Videos.List
+            videosListRequest.MyRating = VideosResource.ListRequest.MyRatingEnum.Like; // Set MyRating to "like" to get liked videos
+            videosListRequest.MaxResults = 50; // Adjust as needed, max is 50
+
+            VideoListResponse videosResponse;
+            List<string> likedVideoTitles = new List<string>();
+            string nextPageToken = null;
+
+            do
+            {
+                videosListRequest.PageToken = nextPageToken;
+                videosResponse = await videosListRequest.ExecuteAsync();
+
+                if (videosResponse.Items != null)
+                {
+                    foreach (var video in videosResponse.Items)
+                    {
+                        likedVideoTitles.Add(video.Snippet.Title);
+                    }
+                }
+                nextPageToken = videosResponse.NextPageToken;
+
+            } while (nextPageToken != null);
+
+            return likedVideoTitles;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving liked videos: {ex.Message}");
+            return null;
+        }
+    }
 }
