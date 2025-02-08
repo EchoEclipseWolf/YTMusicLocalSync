@@ -7,32 +7,59 @@ namespace YTMusicLocalSync {
         public static Config Configuration { get; private set; }
 
         static async Task Main(string[] args) {
-            Configuration = Config.Load();
+// Main program loop
+            while (true)
+            {
+                Console.WriteLine("Options:");
+                Console.WriteLine("1. Load YouTube Playlists");
+                Console.WriteLine("2. Exit");
+                Console.Write("Enter your choice: ");
 
-            Console.WriteLine($"DirToPlaylists from config: {Configuration.DirToPlaylists}");
+                string? choice = Console.ReadLine();
 
-            API api = new API();
-            await api.Start(async (youtubeService) => {
-                if (youtubeService != null) {
-                    Console.WriteLine("Successfully connected to YouTube API.");
-                    var playlists = await api.GetUserPlaylistsAsync(youtubeService);
-                    if (playlists != null) {
-                        Console.WriteLine("\nYour YouTube Playlists:");
-                        foreach (var playlist in playlists) {
-                            Console.WriteLine($"- {playlist}");
-                        }
-                    }
-                    else {
-                        Console.WriteLine("Failed to retrieve playlists.");
-                    }
+                switch (choice)
+                {
+                    case "1":
+                        Console.WriteLine("Loading YouTube Playlists...");
+                        Configuration = Config.Load();
+
+                        Console.WriteLine($"DirToPlaylists from config: {Configuration.DirToPlaylists}");
+
+                        API api = new API();
+                        await api.Start(async (youtubeService) => {
+                            if (youtubeService != null) {
+                                Console.WriteLine("Successfully connected to YouTube API.");
+                                var playlists = await api.GetUserPlaylistsAsync(youtubeService);
+                                if (playlists != null) {
+                                    Console.WriteLine("\nYour YouTube Playlists:");
+                                    foreach (var playlist in playlists) {
+                                        Console.WriteLine($"- {playlist}");
+                                    }
+                                }
+                                else {
+                                    Console.WriteLine("Failed to retrieve playlists.");
+                                }
+                            }
+                            else {
+                                Console.WriteLine("Failed to initialize YouTube API. Program will exit.");
+                                Environment.Exit(1);
+                            }
+                        });
+
+                        Console.ReadKey();
+                        break;
+                    case "2":
+                        Console.WriteLine("Exiting.");
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
                 }
-                else {
-                    Console.WriteLine("Failed to initialize YouTube API. Program will exit.");
-                    Environment.Exit(1);
-                }
-            });
 
-            Console.ReadKey();
+                Console.WriteLine("\nPress any key to continue...");
+                Console.ReadKey();
+                Console.Clear();
+            }
         }
     }
 }
